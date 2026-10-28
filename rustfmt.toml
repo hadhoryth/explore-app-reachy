@@ -1,0 +1,7 @@
+# Formatting per https://google.github.io/styleguide/rustguide.html
+max_width = 100
+
+# Nightly-only options from the guide; uncomment if using `cargo +nightly fmt`.
+# hex_literal_case = "Lower"
+# format_macro_matchers = true
+# imports_granularity = "Module"
