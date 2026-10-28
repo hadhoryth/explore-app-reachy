@@ -1,0 +1,10 @@
+[package]
+name = "explore-app"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+mujoco-rs = { version = "7.0.0", features = ["viewer-ui"] }
+
+[patch.crates-io]
+glutin = { git = "https://github.com/davidhozic/glutin", rev = "6409c8319e1c2eccc47f95e98a2941b5aab772eb" }
