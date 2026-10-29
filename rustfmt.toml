@@ -4,6 +4,6 @@ struct_lit_width = 60
 fn_single_line = true
 
 # Nightly-only options from the guide; uncomment if using `cargo +nightly fmt`.
-# hex_literal_case = "Lower"
-# format_macro_matchers = true
-# imports_granularity = "Module"
+hex_literal_case = "Lower"
+format_macro_matchers = true
+imports_granularity = "Module"

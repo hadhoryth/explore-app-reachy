@@ -6,14 +6,12 @@ use crate::motion::Antennas;
 pub type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
 pub trait Backend {
-    #[rustfmt::skip]
     fn is_running(&self) -> bool { true }
 
     fn read(&mut self) -> Result<Antennas>;
     fn write(&mut self, target: Antennas) -> Result<()>;
 
-    #[rustfmt::skip]
-    fn advance(&mut self, period: Duration) -> Result<()>{ Ok(()) }
+    fn advance(&mut self, period: Duration) -> Result<()> { Ok(()) }
 }
 
 #[cfg(test)]
@@ -24,13 +22,9 @@ mod tests {
     struct Still;
 
     impl Backend for Still {
-        fn read(&mut self) -> Result<Antennas> {
-            Ok(Antennas { right: 0.0, left: 0.0 })
-        }
+        fn read(&mut self) -> Result<Antennas> { Ok(Antennas { right: 0.0, left: 0.0 }) }
 
-        fn write(&mut self, _target: Antennas) -> Result<()> {
-            Ok(())
-        }
+        fn write(&mut self, _target: Antennas) -> Result<()> { Ok(()) }
     }
 
     #[test]

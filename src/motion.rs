@@ -29,17 +29,13 @@ fn min_jerk(progress: f64) -> f64 {
     p * p * p * (10. - 15. * p + 6. * p * p)
 }
 
-fn interpolate(from: f64, to: f64, progress: f64) -> f64 {
-    from + (to - from) * progress
-}
+fn interpolate(from: f64, to: f64, progress: f64) -> f64 { from + (to - from) * progress }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    fn pose(right: f64, left: f64) -> Antennas {
-        Antennas { right, left }
-    }
+    fn pose(right: f64, left: f64) -> Antennas { Antennas { right, left } }
 
     #[test]
     fn interpolate_goes_from_start_to_end() {
