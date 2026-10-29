@@ -5,6 +5,8 @@ edition = "2024"
 
 [dependencies]
 mujoco-rs = { version = "7.0.0", features = ["viewer-ui"] }
+rustypot = "=1.13.1"
+serialport = { version = "4.10.1", default-features = false }
 
 [patch.crates-io]
 glutin = { git = "https://github.com/davidhozic/glutin", rev = "6409c8319e1c2eccc47f95e98a2941b5aab772eb" }
