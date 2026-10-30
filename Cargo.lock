@@ -596,6 +596,7 @@ dependencies = [
 name = "explore-app"
 version = "0.1.0"
 dependencies = [
+ "clap",
  "mujoco-rs",
  "rustypot",
  "serialport",
