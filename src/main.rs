@@ -3,29 +3,41 @@
 mod backend;
 mod motion;
 mod motions;
+mod sim;
 
 use clap::{ArgGroup, Parser};
+use std::sync::atomic::{AtomicBool, Ordering};
 
-use crate::backend::Result;
+use crate::backend::{Backend, Result};
+use crate::motion::play;
+use crate::motions::antenna_wiggle;
+use crate::sim::{SCENE, Sim};
 
 #[derive(Parser)]
 #[command(group(ArgGroup::new("target").required(true).args(["sim", "device"])))]
 struct Cli {
+    /// Run in the MuJoCo simulator.
     #[arg(long)]
     sim: bool,
 
+    /// Drive a Reachy Mini Lite connected over USB.
     #[arg(long)]
     device: bool,
 
+    /// Serial port to use. Found from the robot's USB IDs if left out.
     #[arg(long, conflicts_with = "sim")]
     port: Option<String>,
 
+    /// Only print the antenna angles, with torque off.
     #[arg(long, conflicts_with = "sim")]
     watch: bool,
 }
 
+static STOP: AtomicBool = AtomicBool::new(false);
+
 fn main() -> Result<()> {
     let cli = Cli::parse();
+    ctrlc::set_handler(|| STOP.store(true, Ordering::Relaxed))?;
     if cli.sim {
         run_sim()
     } else {
@@ -33,7 +45,12 @@ fn main() -> Result<()> {
     }
 }
 
-fn run_sim() -> Result<()> { Ok(()) }
+fn run_sim() -> Result<()> {
+    let mut backend = Sim::new(&SCENE)?;
+    play(&mut backend, &antenna_wiggle(), &STOP)?;
+    backend.hold(&STOP)?;
+    Ok(())
+}
 
 fn run_device(port: Option<&str>, watch_only: bool) -> Result<()> { Ok(()) }
 
