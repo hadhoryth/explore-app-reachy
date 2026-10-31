@@ -1,2 +1,5 @@
+[env]
+MUJOCO_DYNAMIC_LINK_DIR = { value = "third_party/mujoco.framework/Versions/A", relative = true }
+
 [target.'cfg(target_os = "macos")']
 rustflags = ["-C", "link-arg=-Wl,-rpath,third_party"]
