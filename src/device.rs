@@ -1,6 +1,7 @@
 use std::thread;
 use std::time::Duration;
 
+use mujoco_rs::viewer::egui::accesskit::Role::Status;
 use rustypot::DynamixelProtocolHandler;
 use rustypot::servo::dynamixel::xl330;
 use serialport::{SerialPort, SerialPortInfo, SerialPortType};
@@ -14,6 +15,9 @@ const USB_PRODUCT_ID: u16 = 0x55d3;
 
 /// Bits per second on the motor bus, set in every motor's EEPROM.
 const BAUD_RATE: u32 = 1_000_000;
+
+/// The hardware error bit for input voltage, which the Lite's motors don't shut down on.
+const INPUT_VOLTAGE_ERROR: u8 = 0b0000_0001;
 
 /// How long to wait for a motor's reply before giving up.
 const REPLY_TIMEOUT: Duration = Duration::from_millis(10);
@@ -42,6 +46,7 @@ impl Device {
             protocol: DynamixelProtocolHandler::v2(),
             torque_on: false,
         };
+        device.clear_errors();
         device.set_torque(false)?;
         Ok(device)
     }
@@ -54,6 +59,27 @@ impl Device {
             &[on, on],
         )?;
         self.torque_on = on;
+        Ok(())
+    }
+
+    fn clear_errors(&mut self) -> Result<()> {
+        let statuses = xl330::sync_read_hardware_error_status(
+            &self.protocol,
+            self.port.as_mut(),
+            &ANTENNA_IDS,
+        )?;
+        for (&id, &status) in ANTENNA_IDS.iter().zip(&statuses) {
+            if !needs_reboot(status) {
+                continue;
+            }
+            println!("Motor {id} reports hardware error {status:#010b}; rebooting it.");
+            self.protocol.reboot(self.port.as_mut(), id)?;
+            thread::sleep(Duration::from_millis(500));
+            if !self.protocol.ping(self.port.as_mut(), id).unwrap_or(false) {
+                return Err(format!("motor {id} didn't answer after rebooting").into());
+            }
+        }
+
         Ok(())
     }
 }
@@ -78,6 +104,8 @@ fn find_port() -> Result<String> {
 fn is_reachy_lite(port: &SerialPortInfo) -> bool {
     matches!(&port.port_type, SerialPortType::UsbPort(usb) if usb.vid == USB_VENDOR_ID && usb.pid == USB_PRODUCT_ID)
 }
+
+fn needs_reboot(status: u8) -> bool { status & !INPUT_VOLTAGE_ERROR != 0 }
 
 #[cfg(test)]
 mod tests {
@@ -116,5 +144,18 @@ mod tests {
             port_type: SerialPortType::Unknown,
         };
         assert!(!is_reachy_lite(&port));
+    }
+
+    #[test]
+    fn healthy_and_low_voltage_need_no_reboot() {
+        assert!(!needs_reboot(0b0000_0000));
+        assert!(!needs_reboot(0b0000_0001));
+    }
+
+    #[test]
+    fn real_errors_need_a_reboot() {
+        assert!(needs_reboot(0b0010_0000)); // overload
+        assert!(needs_reboot(0b0000_0100)); // overheating
+        assert!(needs_reboot(0b0010_0001)); // overload and low voltage
     }
 }
