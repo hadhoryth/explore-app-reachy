@@ -1,15 +1,20 @@
 #![allow(dead_code)]
 
 mod backend;
+mod device;
 mod motion;
 mod motions;
 mod sim;
+
+use std::thread;
+use std::time::Duration;
 
 use clap::{ArgGroup, Parser};
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use crate::backend::{Backend, Result};
-use crate::motion::play;
+use crate::device::Device;
+use crate::motion::{Antennas, play};
 use crate::motions::antenna_wiggle;
 use crate::sim::{SCENE, Sim};
 
@@ -52,7 +57,30 @@ fn run_sim() -> Result<()> {
     Ok(())
 }
 
-fn run_device(port: Option<&str>, watch_only: bool) -> Result<()> { Ok(()) }
+fn run_device(port: Option<&str>, watch_only: bool) -> Result<()> {
+    let mut device = Device::open(port)?;
+    if watch_only {
+        return watch(&mut device);
+    }
+    Ok(())
+}
+
+fn watch(backend: &mut dyn Backend) -> Result<()> {
+    println!("Torque is off move antennas manually");
+    let mut angles = Antennas::REST;
+    while !STOP.load(Ordering::Relaxed) {
+        let next = backend.read()?;
+        if next.right != angles.right || next.left != angles.left {
+            angles = next;
+            println!(
+                "right {:+.3} rad   left {:+.3} rad",
+                angles.right, angles.left
+            );
+        }
+        thread::sleep(Duration::from_millis(200));
+    }
+    Ok(())
+}
 
 #[cfg(test)]
 mod tests {
