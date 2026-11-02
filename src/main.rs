@@ -1,22 +1,18 @@
-#![allow(dead_code)]
-
-mod backend;
-mod device;
-mod motion;
-mod motions;
-mod sim;
-
-use std::thread;
-use std::time::Duration;
+// use std::thread;
+// use std::time::Duration;
 
 use clap::{ArgGroup, Parser};
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use crate::backend::{Backend, Result};
-use crate::device::Device;
-use crate::motion::{Antennas, play};
-use crate::motions::antenna_wiggle;
-use crate::sim::{SCENE, Sim};
+// use crate::device::Device;
+// use crate::motion::{Antennas, play};
+// use crate::motions::antenna_wiggle;
+// use crate::sim::{SCENE, Sim};
+//
+//
+use std::error::Error;
+use std::result;
+pub type Result<T> = result::Result<T, Box<dyn Error>>;
 
 #[derive(Parser)]
 #[command(group(ArgGroup::new("target").required(true).args(["sim", "device"])))]
@@ -41,48 +37,51 @@ struct Cli {
 static STOP: AtomicBool = AtomicBool::new(false);
 
 fn main() -> Result<()> {
-    let cli = Cli::parse();
+    let _cli = Cli::parse();
     ctrlc::set_handler(|| STOP.store(true, Ordering::Relaxed))?;
-    if cli.sim {
-        run_sim()
-    } else {
-        run_device(cli.port.as_deref(), cli.watch)
-    }
+    Ok(())
+    // if cli.sim {
+    //     run_sim()
+    // } else {
+    //     run_device(cli.port.as_deref(), cli.watch)
+    // }
 }
 
-fn run_sim() -> Result<()> {
-    let mut backend = Sim::new(&SCENE)?;
-    play(&mut backend, &antenna_wiggle(), &STOP)?;
-    backend.hold(&STOP)?;
-    Ok(())
-}
-
-fn run_device(port: Option<&str>, watch_only: bool) -> Result<()> {
-    let mut device = Device::open(port)?;
-    if watch_only {
-        return watch(&mut device);
-    }
-    device.enable()?;
-    play(&mut device, &antenna_wiggle(), &STOP)?;
-    Ok(())
-}
-
-fn watch(backend: &mut dyn Backend) -> Result<()> {
-    println!("Torque is off move antennas manually");
-    let mut angles = Antennas::REST;
-    while !STOP.load(Ordering::Relaxed) {
-        let next = backend.read()?;
-        if next.right != angles.right || next.left != angles.left {
-            angles = next;
-            println!(
-                "right {:+.3} rad   left {:+.3} rad",
-                angles.right, angles.left
-            );
-        }
-        thread::sleep(Duration::from_millis(200));
-    }
-    Ok(())
-}
+// fn run_sim() -> Result<()> {
+//     !todo!("Later")
+//     // let mut backend = Sim::new(&SCENE)?;
+//     // play(&mut backend, &antenna_wiggle(), &STOP)?;
+//     // backend.hold(&STOP)?;
+//     // Ok(())
+// }
+//
+// fn run_device(port: Option<&str>, watch_only: bool) -> Result<()> {
+//     !todo!("Later")
+//     // let mut device = Device::open(port)?;
+//     // if watch_only {
+//     //     return watch(&mut device);
+//     // }
+//     // device.enable()?;
+//     // play(&mut device, &antenna_wiggle(), &STOP)?;
+//     // Ok(())
+// }
+//
+// fn watch(backend: &mut dyn Backend) -> Result<()> {
+//     println!("Torque is off move antennas manually");
+//     let mut angles = Antennas::REST;
+//     while !STOP.load(Ordering::Relaxed) {
+//         let next = backend.read()?;
+//         if next.right != angles.right || next.left != angles.left {
+//             angles = next;
+//             println!(
+//                 "right {:+.3} rad   left {:+.3} rad",
+//                 angles.right, angles.left
+//             );
+//         }
+//         thread::sleep(Duration::from_millis(200));
+//     }
+//     Ok(())
+// }
 
 #[cfg(test)]
 mod tests {
