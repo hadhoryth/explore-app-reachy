@@ -1,0 +1,48 @@
+      <!-- One assignment. Copy, rename the ids (aN, fN), and fill every part.
+           No Rust code here: pseudocode blocks use data-lang="text", and Rust goes in Files. -->
+      <div class="step" id="aN" data-n="N">
+        <h3>Title in sentence case</h3>
+        <ul class="learn"><li class="rust"><b>Rust:</b> the 3 to 5 features this teaches</li><li class="robot"><b>Robotics:</b> the 2 to 4 ideas this teaches</li></ul>
+
+        <h4>Prerequisites</h4>
+        <ul class="prereq">
+          <li>Assignment N−1: <code>cargo test</code> shows K passing.</li>
+          <li>Any file, hardware or earlier concept this needs.</li>
+        </ul>
+
+        <h4>Theory</h4>
+        <p><strong>Concept in bold.</strong> The robotics or embedded idea, explained from first
+        principles, with the numbers that matter and where they come from.</p>
+        <div class="code pseudo"><span class="file">Pseudocode: what this computes</span><pre><code data-lang="text">algorithm(inputs):
+    step ← …
+    return …</code></pre></div>
+
+        <h4>Design</h4>
+        {{UML:aN}}
+        <p>What the diagram can’t say: which module owns what, why a field is private, what is
+        left to the learner’s judgment. Names in the diagram are the names the tests use.</p>
+
+        <h4>Rust you’ll need</h4>
+        {{RUST:aN}}
+
+        <h4>Task</h4>
+        <ol class="task-steps">
+          <li><strong>Step.</strong> What to build, in words, pointing at the pseudocode and the diagram.</li>
+          <li>Data the learner can’t derive goes in a table here, and as a copy block in Files.</li>
+        </ol>
+
+        <h4>Check</h4>
+        <p>Copy <a href="#fN">the tests for <code>file.rs</code></a> to the bottom of the file.</p>
+        <div class="code output"><span class="file">When you’re done: cargo test</span><pre><code data-lang="text">test result: ok. K passed; 0 failed; 0 ignored; 0 measured; 0 filtered out</code></pre></div>
+      </div>
+
+      <!-- Its Files entry, in parts/30_files.html: -->
+      <details class="files" id="fN"><summary>Assignment N · tests for <code>file.rs</code></summary><div>
+        <div class="code"><span class="file">src/file.rs, at the bottom</span><pre><code data-lang="rust">{{ITEM:code/solution/src/file.rs::mod tests {}}</code></pre></div>
+      </div></details>
+
+      <!-- And its solution, in parts/40_solutions.html: -->
+      <details class="solution" id="sN"><summary>N · Title</summary><div>
+        <div class="code"><span class="file">src/file.rs, without its tests</span><pre><code data-lang="rust">{{HEAD:code/solution/src/file.rs}}</code></pre></div>
+        <ul><li><strong>Why this choice?</strong> The reasons behind what the contract didn’t force.</li></ul>
+      </div></details>

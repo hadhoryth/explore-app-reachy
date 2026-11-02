@@ -1,2 +1,5 @@
 /target
 MUJOCO_LOG.TXT
+
+.roadmap
+__pycache__
