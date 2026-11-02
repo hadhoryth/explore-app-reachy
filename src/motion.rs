@@ -50,11 +50,11 @@ pub fn play(backend: &mut dyn Backend, moves: &[Move], stop: &AtomicBool) -> Res
         let target = next.target.clamped();
         let ticks = next.duration.div_duration_f64(CONTROL_PERIOD).round() as u32;
         for tik in 1..=ticks {
-            if stop.load(Ordering::Relaxed) {
+            if stop.load(Ordering::Relaxed) || !backend.is_running() {
                 return Ok(());
             }
             let started = Instant::now();
-            let progress = min_jerk(f64::from(tik / ticks));
+            let progress = min_jerk(f64::from(tik) / f64::from(ticks));
             backend.write(current.toward(target, progress))?;
             backend.advance(CONTROL_PERIOD)?;
             if let Some(rest) = CONTROL_PERIOD.checked_sub(started.elapsed()) {
@@ -184,5 +184,16 @@ mod tests {
         let mut backend = recorder();
         play(&mut backend, &one_move(0.5, -0.5), &AtomicBool::new(true)).unwrap();
         assert!(backend.written.is_empty());
+    }
+
+    #[test]
+    fn play_moves_through_the_middle_of_a_move() {
+        let mut backend = recorder();
+        play(&mut backend, &one_move(0.5, -0.5), &AtomicBool::new(false)).unwrap();
+        let rights: Vec<f64> = backend.written.iter().map(|pose| pose.right).collect();
+        assert!(
+            rights.windows(2).all(|pair| pair[0] < pair[1]),
+            "stuck, then jumped: {rights:?}"
+        );
     }
 }

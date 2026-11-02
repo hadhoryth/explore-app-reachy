@@ -1,0 +1,166 @@
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Syntax highlighting ---------- */
+  var esc = function (s) {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  };
+  var rules = {
+    rust: [
+      ["t-todo", /todo!\([^)\n]*\)/y],
+      ["t-com", /\/\/[^\n]*/y],
+      ["t-str", /"(?:\\.|[^"\\])*"/y],
+      ["t-key", /\b(?:use|mod|const|static|fn|let|mut|for|in|if|else|while|loop|return|continue|break|as|pub|struct|impl|trait|type|dyn|match|crate|super|Some|None|Ok|Err|self|Self|true|false)\b/y],
+      ["t-type", /\b(?:[A-Z][A-Za-z0-9_]*|f64|f32|usize|u8|u16|u32|i32|i64|bool|str)\b/y],
+      ["t-num", /\b(?:0x[0-9a-fA-F]+|0b[01_]+|\d[\d_]*(?:\.\d+)?)\b/y],
+      ["t-key", /\b[a-z_]+!/y]
+    ],
+    bash: [
+      ["t-com", /(?:^|(?<=\s))#[^\n]*/my],
+      ["t-str", /"(?:\\.|[^"\\])*"|'[^']*'/y],
+      ["t-type", /\$\(?[A-Za-z_][A-Za-z0-9_]*/y],
+      ["t-key", /\b(?:cargo|cd|ls|echo|sudo|grep|git|lsusb|system_profiler|python)\b/y]
+    ],
+    toml: [
+      ["t-type", /^\[[^\]\n]+\]/my],
+      ["t-str", /"(?:\\.|[^"\\])*"/y],
+      ["t-key", /^[A-Za-z_][A-Za-z0-9_-]*(?=\s*=)/my],
+      ["t-num", /\b\d+(?:\.\d+)?\b/y]
+    ]
+  };
+  function highlight(src, lang) {
+    var list = rules[lang];
+    if (!list) return esc(src);
+    var out = "", i = 0, plain = "";
+    while (i < src.length) {
+      var hit = null;
+      for (var r = 0; r < list.length; r++) {
+        var re = list[r][1];
+        re.lastIndex = i;
+        var m = re.exec(src);
+        if (m && m.index === i && m[0].length) { hit = [list[r][0], m[0]]; break; }
+      }
+      if (hit) {
+        out += esc(plain); plain = "";
+        out += '<span class="' + hit[0] + '">' + esc(hit[1]) + "</span>";
+        i += hit[1].length;
+      } else {
+        plain += src[i]; i++;
+      }
+    }
+    return out + esc(plain);
+  }
+  var rawText = new WeakMap();
+  document.querySelectorAll("code[data-lang]").forEach(function (el) {
+    var raw = el.textContent;
+    rawText.set(el, raw);
+    try {
+      var lit = highlight(raw, el.getAttribute("data-lang"));
+      var marks = el.getAttribute("data-new");
+      if (marks !== null) {
+        var set = {};
+        marks.split(",").forEach(function (n) { if (n) set[+n] = true; });
+        lit = lit.split("\n").map(function (line, i) {
+          return '<span class="ln' + (set[i + 1] ? " new" : "") + '">' + (line || "\u200b") + "</span>";
+        }).join("");
+      }
+      el.innerHTML = lit;
+    } catch (e) { /* leave plain text */ }
+  });
+
+  /* ---------- Copy buttons ---------- */
+  document.querySelectorAll(".code").forEach(function (block) {
+    var code = block.querySelector("code");
+    if (!code || block.querySelector(".tree")) return;
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "copy";
+    btn.textContent = "Copy";
+    btn.setAttribute("aria-label", "Copy code");
+    btn.addEventListener("click", function () {
+      var text = rawText.has(code) ? rawText.get(code) : code.textContent;
+      var done = function (ok) {
+        btn.textContent = ok ? "Copied" : "Select and copy";
+        setTimeout(function () { btn.textContent = "Copy"; }, 1600);
+      };
+      function selectCode() {
+        var range = document.createRange();
+        range.selectNodeContents(code);
+        var sel = window.getSelection();
+        sel.removeAllRanges(); sel.addRange(range);
+      }
+      try {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, function () { selectCode(); done(false); });
+      } catch (e) { selectCode(); done(false); }
+    });
+    block.appendChild(btn);
+  });
+
+  /* ---------- Fold the contents (focus mode) ---------- */
+  var tocToggle = document.querySelector(".toc-toggle");
+  if (tocToggle) {
+    var root = document.documentElement;
+    var showToc = function (hidden, remember) {
+      if (hidden) root.setAttribute("data-toc", "hidden");
+      else root.removeAttribute("data-toc");
+      var label = hidden ? "Show the contents" : "Hide the contents";
+      tocToggle.setAttribute("aria-expanded", hidden ? "false" : "true");
+      tocToggle.setAttribute("aria-label", label);
+      tocToggle.title = label;
+      if (remember) {
+        try { localStorage.setItem("roadmap-toc", hidden ? "hidden" : "shown"); } catch (e) {}
+      }
+    };
+    showToc(root.getAttribute("data-toc") === "hidden", false);
+    tocToggle.addEventListener("click", function () {
+      showToc(root.getAttribute("data-toc") !== "hidden", true);
+    });
+  }
+
+  /* ---------- Open a folded section when a link points at it ---------- */
+  var openTarget = function () {
+    var id = decodeURIComponent(location.hash.slice(1));
+    var el = id && document.getElementById(id);
+    while (el) {
+      if (el.tagName === "DETAILS") el.open = true;
+      el = el.parentElement;
+    }
+  };
+  window.addEventListener("hashchange", openTarget);
+  openTarget();
+
+  /* ---------- Tabs ---------- */
+  document.querySelectorAll("[data-tabs]").forEach(function (group) {
+    var tabs = Array.prototype.slice.call(group.querySelectorAll('[role="tab"]'));
+    function select(tab) {
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.setAttribute("aria-selected", on ? "true" : "false");
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+      });
+    }
+    tabs.forEach(function (tab, idx) {
+      tab.addEventListener("click", function () { select(tab); });
+      tab.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+          var next = tabs[(idx + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+          select(next); next.focus(); e.preventDefault();
+        }
+      });
+    });
+  });
+  // Open the Linux tabs first on Linux machines.
+  try {
+    if (/Linux/.test(navigator.userAgent) && !/Android/.test(navigator.userAgent)) {
+      ["tab-usb-linux"].forEach(function (id) {
+        var tab = document.getElementById(id);
+        if (tab) tab.click();
+      });
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

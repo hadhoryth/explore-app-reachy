@@ -62,6 +62,8 @@ fn run_device(port: Option<&str>, watch_only: bool) -> Result<()> {
     if watch_only {
         return watch(&mut device);
     }
+    device.enable()?;
+    play(&mut device, &antenna_wiggle(), &STOP)?;
     Ok(())
 }
 

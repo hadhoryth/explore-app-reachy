@@ -57,14 +57,14 @@ impl<'model> Sim {
 impl Backend for Sim {
     fn read(&mut self) -> Result<Antennas> {
         Ok(Antennas {
-            right: -self.right_joint.view(&self.data).qpos[0],
-            left: self.left_joint.view(&self.data).qpos[0],
+            right: self.right_joint.view(&self.data).qpos[0],
+            left: -self.left_joint.view(&self.data).qpos[0],
         })
     }
 
     fn write(&mut self, target: Antennas) -> Result<()> {
-        self.right_motor.view_mut(&mut self.data).ctrl[0] = -target.right;
-        self.left_motor.view_mut(&mut self.data).ctrl[0] = target.left;
+        self.right_motor.view_mut(&mut self.data).ctrl[0] = target.right;
+        self.left_motor.view_mut(&mut self.data).ctrl[0] = -target.left;
         Ok(())
     }
 
