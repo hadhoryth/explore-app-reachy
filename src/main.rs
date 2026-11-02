@@ -1,6 +1,8 @@
 // use std::thread;
 // use std::time::Duration;
 
+mod model;
+
 use clap::{ArgGroup, Parser};
 use std::sync::atomic::{AtomicBool, Ordering};
 

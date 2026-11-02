@@ -105,10 +105,11 @@ img, svg { max-width: 100%; }
   :root[data-toc="hidden"] article { margin: 0 auto; }
 }
 
-article { max-width: 46rem; min-width: 0; }
+/* The reading area: 19px, and everything inside it sized relative to that (em, not rem) */
+article { max-width: 50rem; min-width: 0; font-size: 19px; line-height: 1.65; }
 article > section { margin-bottom: 64px; }
-h2 { font-size: 1.75rem; line-height: 1.2; letter-spacing: -0.015em; margin: 0 0 16px; }
-h3 { font-size: 1.15rem; margin: 32px 0 8px; }
+h2 { font-size: 1.6em; line-height: 1.2; letter-spacing: -0.015em; margin: 0 0 16px; }
+h3 { font-size: 1.15em; margin: 32px 0 8px; }
 p { margin: 0 0 16px; }
 ul, ol { padding-left: 1.3em; margin: 0 0 16px; }
 li { margin-bottom: 6px; }
@@ -118,20 +119,20 @@ code { font-family: var(--mono); font-size: 0.88em; }
 /* Steps and assignments */
 .step { position: relative; padding-left: 60px; margin-bottom: 56px; }
 .step::before { content: attr(data-n); position: absolute; left: 0; top: -2px; width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--ink); display: grid; place-items: center; font-weight: 700; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
-.step h3 { margin-top: 4px; font-size: 1.3rem; }
-.step h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin: 28px 0 8px; }
+.step h3 { margin-top: 4px; font-size: 1.35em; }
+.step h4 { font-size: 0.74em; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin: 28px 0 8px; }
 .learn { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0 0 16px; padding: 0; }
-.learn li { margin: 0; font-size: 0.86rem; padding: 2px 10px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); }
+.learn li { margin: 0; font-size: 0.8em; padding: 2px 10px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); }
 .learn li.rust { border-color: var(--link); }
 .learn li.robot { border-color: var(--antenna); }
 .learn li b { font-weight: 600; }
 
 /* Code */
 .code { position: relative; background: var(--code-bg); color: var(--code-ink); border-radius: 12px; margin: 0 0 20px; }
-.code .file { display: block; padding: 10px 16px 0; font-size: 0.85rem; color: var(--code-muted); }
-.code pre { margin: 0; padding: 14px 16px 16px; overflow-x: auto; font-family: var(--mono); font-size: 0.86rem; line-height: 1.6; tab-size: 4; }
+.code .file { display: block; padding: 10px 16px 0; font-size: 0.78em; color: var(--code-muted); }
+.code pre { margin: 0; padding: 14px 16px 16px; overflow-x: auto; font-family: var(--mono); font-size: 0.8em; line-height: 1.6; tab-size: 4; }
 .code pre code { font-size: inherit; }
-.code .copy { position: absolute; top: 8px; right: 8px; font: inherit; font-size: 0.8rem; font-weight: 600; color: var(--code-ink); background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 6px; padding: 3px 10px; cursor: pointer; }
+.code .copy { position: absolute; top: 8px; right: 8px; font: inherit; font-size: 0.72em; font-weight: 600; color: var(--code-ink); background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 6px; padding: 3px 10px; cursor: pointer; }
 .code .copy:hover { background: rgba(255, 255, 255, 0.16); }
 .t-com { color: var(--code-muted); font-style: italic; }
 .t-key { color: var(--code-key); }
@@ -156,7 +157,7 @@ code { font-family: var(--mono); font-size: 0.88em; }
 /* Tabs */
 .tabs { margin-bottom: 20px; }
 .tablist { display: flex; gap: 6px; margin-bottom: 10px; }
-.tablist button { font: inherit; font-size: 0.95rem; font-weight: 600; padding: 6px 16px; border-radius: 999px; border: 1.5px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; }
+.tablist button { font: inherit; font-size: 0.88em; font-weight: 600; padding: 6px 16px; border-radius: 999px; border: 1.5px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; }
 .tablist button[aria-selected="true"] { border-color: var(--ink); color: var(--ink); }
 [role="tabpanel"][hidden] { display: none; }
 
@@ -167,15 +168,15 @@ code { font-family: var(--mono); font-size: 0.88em; }
 /* Diagram */
 .paths { display: grid; gap: 14px; margin: 8px 0 20px; }
 .path { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
-.path .label { width: 100%; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
-.path .box { padding: 5px 12px; border-radius: 8px; border: 1.5px solid var(--line); font-size: 0.93rem; }
+.path .label { width: 100%; font-weight: 600; font-size: 0.9em; margin-bottom: 2px; }
+.path .box { padding: 5px 12px; border-radius: 8px; border: 1.5px solid var(--line); font-size: 0.88em; }
 .path .box.you { border-color: var(--ink); font-weight: 600; }
 .path .box.hot { border-color: var(--antenna); }
 .path .arrow { color: var(--muted); }
 
 /* Tables */
 .table-wrap { overflow-x: auto; margin: 0 0 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
-table { border-collapse: collapse; width: 100%; font-size: 0.93rem; font-variant-numeric: tabular-nums; }
+table { border-collapse: collapse; width: 100%; font-size: 0.88em; font-variant-numeric: tabular-nums; }
 th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
 tr:last-child td { border-bottom: 0; }
 th { font-weight: 600; }
@@ -202,7 +203,7 @@ details.solution { border-left: 4px solid var(--antenna); }
 details.solution summary::before { content: "Solution · "; color: var(--accent); }
 details[open] > summary { border-bottom: 1px solid var(--line); margin-bottom: 14px; }
 
-footer { border-top: 1px solid var(--line); padding-top: 24px; color: var(--muted); font-size: 0.92rem; }
+footer { border-top: 1px solid var(--line); padding-top: 24px; color: var(--muted); font-size: 0.85em; }
 
 @media (max-width: 960px) {
   .hero { grid-template-columns: 1fr; gap: 32px; padding-top: 40px; }
@@ -211,6 +212,7 @@ footer { border-top: 1px solid var(--line); padding-top: 24px; color: var(--mute
 }
 @media (max-width: 560px) {
   body { font-size: 16px; }
+  article { font-size: 17px; }
   .page { padding: 0 16px 72px; }
   .step { padding-left: 0; padding-top: 52px; }
   .step::before { top: 0; }

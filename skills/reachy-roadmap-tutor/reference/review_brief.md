@@ -15,8 +15,9 @@ The learner, Ivan, is building step by step a Rust program that drives a Pollen 
 Mini Lite (9 Dynamixel motors over USB) in the MuJoCo simulator or on the real robot. He is new
 to Rust and wants to write every line himself: each assignment gives prerequisites, theory with
 algorithmic pseudocode, a UML class diagram, the Rust features needed, the task in words, and a
-check. No Rust appears above the Files section; tests and data are at the bottom to copy;
-solutions are folded at the very end. This guide: [number, title, goal].
+check. One page per assignment, opening with its goal and the path through its parts; each
+part has its own theory, diagram, task and tests; the Rust reference sits in a side panel;
+solutions are folded at the end. No Rust is shown unfolded. This guide: [number, title, goal].
 
 ## Files
 - Draft page: [path to built .html]; built from [guide source folder] with
@@ -35,7 +36,7 @@ solutions are folded at the very end. This guide: [number, title, goal].
    test counts after each assignment, and the solution; any stage that wouldn't compile when the
    page says it will; wrong facts.
 3. Pedagogy: can each assignment be done from its theory, pseudocode, diagram and Rust reference
-   alone, without the solution? Is anything under-specified, or does anything above Files give
+   alone, without the solution? Is anything under-specified, or does any unfolded text give
    the code away? Is a Rust feature the task needs missing from "Rust you'll need"?
 4. Rust and embedded best practice: API design, errors versus panics in the control path,
    allocation and printing in the loop, timing, testability, naming. Say what a senior Rust

@@ -118,10 +118,27 @@
     });
   }
 
+  /* ---------- The Rust panel: a drawer behind a button on narrow screens ---------- */
+  var root2 = document.documentElement;
+  var setRust = function (open) {
+    if (open) root2.setAttribute("data-rust", "open");
+    else root2.removeAttribute("data-rust");
+    var t = document.querySelector(".rust-toggle");
+    if (t) t.setAttribute("aria-expanded", open ? "true" : "false");
+  };
+  var rustToggle = document.querySelector(".rust-toggle");
+  if (rustToggle) {
+    rustToggle.addEventListener("click", function () { setRust(root2.getAttribute("data-rust") !== "open"); });
+    var rustClose = document.querySelector(".rust-close");
+    if (rustClose) rustClose.addEventListener("click", function () { setRust(false); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") setRust(false); });
+  }
+
   /* ---------- Open a folded section when a link points at it ---------- */
   var openTarget = function () {
     var id = decodeURIComponent(location.hash.slice(1));
     var el = id && document.getElementById(id);
+    if (el && el.closest && el.closest(".rust-panel")) setRust(true);
     while (el) {
       if (el.tagName === "DETAILS") el.open = true;
       el = el.parentElement;

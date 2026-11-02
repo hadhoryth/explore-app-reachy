@@ -1,48 +1,63 @@
-      <!-- One assignment. Copy, rename the ids (aN, fN), and fill every part.
-           No Rust code here: pseudocode blocks use data-lang="text", and Rust goes in Files. -->
+      <!-- One assignment page body (parts/2N_aN.html). Copy, rename the ids (aN, aN-pK, fN,
+           sN), and fill every part. The only Rust is inside folded <details>; pseudocode uses
+           data-lang="text". The builder adds the step bar, the Rust panel (from rust_refs.py,
+           PER_ASSIGNMENT["aN"]) and the previous/next links. -->
       <div class="step" id="aN" data-n="N">
         <h3>Title in sentence case</h3>
         <ul class="learn"><li class="rust"><b>Rust:</b> the 3 to 5 features this teaches</li><li class="robot"><b>Robotics:</b> the 2 to 4 ideas this teaches</li></ul>
+
+        <h4>Goal</h4>
+        <div class="goal">
+          <p>What this assignment achieves, and why it matters for the robot, in one or two sentences.</p>
+          <p class="goal-done">When you’re done:</p>
+          <ul><li>A concrete outcome.</li><li>Another one.</li><li><code>cargo test</code>: K passing.</li></ul>
+        </div>
 
         <h4>Prerequisites</h4>
         <ul class="prereq">
           <li>Assignment N−1: <code>cargo test</code> shows K passing.</li>
           <li>Any file, hardware or earlier concept this needs.</li>
+          <li class="have"><strong>You already have</strong>: the earlier API this uses, in real Rust: <code>joints.clamped(spec)</code>, …</li>
         </ul>
 
-        <h4>Theory</h4>
-        <p><strong>Concept in bold.</strong> The robotics or embedded idea, explained from first
-        principles, with the numbers that matter and where they come from.</p>
+        <h4>The idea</h4>
+        <p><strong>Why this exists.</strong> One or two short paragraphs; a small table if two things must be told apart.</p>
+        <p><strong>The path.</strong> This assignment has 2 parts. Each ends with tests you can run, so you know a piece works before you build on it:</p>
+        <ol class="path"><li><a href="#aN-p1">First piece</a>, in <code>file.rs</code>: what it is. <span class="count">→ <code>cargo test</code>: K1 passing in all</span></li><li><a href="#aN-p2">Second piece</a>, in <code>other.rs</code>: what it is. <span class="count">→ <code>cargo test</code>: K passing in all</span></li></ol>
+
+        <div class="part" id="aN-p1">
+        <h4 class="part-title"><span class="part-n">Part 1 of 2</span>First piece, in <code>file.rs</code></h4>
+        <h5>Theory</h5>
+        <p><strong>Concept in bold.</strong> Only what this part needs, from first principles, with the numbers and their sources.</p>
         <div class="code pseudo"><span class="file">Pseudocode: what this computes</span><pre><code data-lang="text">algorithm(inputs):
-    step ← …
+    for i from 0 to 8:
+        …
     return …</code></pre></div>
 
-        <h4>Design</h4>
-        {{UML:aN}}
-        <p>What the diagram can’t say: which module owns what, why a field is private, what is
-        left to the learner’s judgment. Names in the diagram are the names the tests use.</p>
+        <h5>Design</h5>
+        {{UML:aN_first}}
+        <p>What the diagram can’t say. Names in the diagram are the names the tests use.</p>
 
-        <h4>Rust you’ll need</h4>
-        {{RUST:aN}}
-
-        <h4>Task</h4>
+        <h5>Task</h5>
         <ol class="task-steps">
-          <li><strong>Step.</strong> What to build, in words, pointing at the pseudocode and the diagram.</li>
-          <li>Data the learner can’t derive goes in a table here, and as a copy block in Files.</li>
+          <li><strong>Step.</strong> What to write, in words, pointing at the pseudocode and the diagram.</li>
         </ol>
 
-        <h4>Check</h4>
-        <p>Copy <a href="#fN">the tests for <code>file.rs</code></a> to the bottom of the file.</p>
-        <div class="code output"><span class="file">When you’re done: cargo test</span><pre><code data-lang="text">test result: ok. K passed; 0 failed; 0 ignored; 0 measured; 0 filtered out</code></pre></div>
-      </div>
-
-      <!-- Its Files entry, in parts/30_files.html: -->
-      <details class="files" id="fN"><summary>Assignment N · tests for <code>file.rs</code></summary><div>
+        <h5>Check</h5>
+        <p>Copy <a href="#fN-1">the tests for <code>file.rs</code></a> to the bottom of that file: how many are new, and how the total adds up.</p>
+        <details class="files" id="fN-1"><summary>Tests for <code>file.rs</code></summary><div>
         <div class="code"><span class="file">src/file.rs, at the bottom</span><pre><code data-lang="rust">{{ITEM:code/solution/src/file.rs::mod tests {}}</code></pre></div>
       </div></details>
+        <div class="code output"><span class="file">When you’re done: cargo test</span><pre><code data-lang="text">test result: ok. K1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out</code></pre></div>
+        <p class="tip"><strong>Green one test at a time.</strong> Only when the tests need many items before they compile: write signatures with <code>todo!()</code> bodies first.</p>
+        </div>
 
-      <!-- And its solution, in parts/40_solutions.html: -->
-      <details class="solution" id="sN"><summary>N · Title</summary><div>
+        <!-- … Part 2 of 2, the same shape, ending with the assignment's count. A single-part
+             assignment uses plain h4 Theory, Design, Task, Check instead of The idea and parts. -->
+
+        <h4>Solution</h4>
+        <details class="solution" id="sN"><summary>open it after your tests pass</summary><div>
         <div class="code"><span class="file">src/file.rs, without its tests</span><pre><code data-lang="rust">{{HEAD:code/solution/src/file.rs}}</code></pre></div>
         <ul><li><strong>Why this choice?</strong> The reasons behind what the contract didn’t force.</li></ul>
       </div></details>
+      </div>

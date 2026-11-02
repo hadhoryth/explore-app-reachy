@@ -10,8 +10,8 @@ A diagram is a list of boxes placed by hand on a grid, plus edges between them:
     edges = [Edge('Joints', 'Head', 'owns', '1')]
     svg = diagram(boxes, edges, title='The joint model')
 
-Member lines starting with '=' are class-scope (consts, associated functions without self) and
-are drawn underlined, as UML does. Edge kinds: owns (filled diamond at the owner), has (hollow
+Member lines starting with '=' are public and class-scope (consts, associated functions without
+self): drawn as '+ …' and underlined, as UML does. '-=' is the private kind: '- …', underlined. Edge kinds: owns (filled diamond at the owner), has (hollow
 diamond), impl (dashed, hollow triangle at the trait), uses (dashed, open arrow), assoc (solid,
 open arrow).
 """
@@ -29,7 +29,7 @@ UML_CSS = '''
 .uml-fig { margin: 0 0 20px; }
 .uml-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
 .uml-wrap svg { display: block; width: 100%; height: auto; min-width: 34rem; }
-.uml-fig figcaption { color: var(--muted); font-size: 0.9rem; padding: 6px 4px 0; }
+.uml-fig figcaption { color: var(--muted); font-size: 0.85em; padding: 6px 4px 0; }
 .uml text { font-family: var(--mono); font-size: 12px; fill: var(--ink); white-space: pre; }
 .uml .stereo { fill: var(--muted); font-size: 11px; }
 .uml .name { font-weight: 700; font-size: 13px; }
@@ -45,9 +45,17 @@ UML_CSS = '''
 .uml .tip-open { fill: none; stroke: var(--muted); stroke-width: 1.3; }
 .uml .lbl { fill: var(--muted); font-size: 11px; }
 .uml .lbl-bg { fill: var(--surface); }
-.uml-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.86rem; color: var(--muted); margin: 0 0 16px; }
+.uml-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.8em; color: var(--muted); margin: 0 0 16px; }
 .uml-legend b { color: var(--ink); font-family: var(--mono); font-weight: 600; }
 '''
+
+
+def shown(line):
+    """The text drawn for a member line: '= x' (public, class-scope) is drawn as '+ x', and
+    '-= x' (private, class-scope) as '- x'."""
+    if line.startswith('-='):
+        return '- ' + line[2:].lstrip()
+    return '+ ' + line[1:].lstrip() if line.startswith('=') else line
 
 
 class Box:
@@ -57,7 +65,7 @@ class Box:
         self.fields, self.methods = list(fields), list(methods)
         self.x, self.y, self.new, self.fake = x, y, new, fake
         lines = [name] + self.fields + self.methods + ([f'«{stereo}»'] if stereo else [])
-        self.w = max(min_w, max(len(line.lstrip('=')) for line in lines) * CHAR_W + 2 * PAD_X)
+        self.w = max(min_w, max(len(shown(line)) for line in lines) * CHAR_W + 2 * PAD_X)
         head = (LINE_H if stereo else 0) + LINE_H + 2 * PAD_Y
         self.head_h = head
         body = 0
@@ -89,8 +97,8 @@ class Box:
                        f'x2="{self.x + self.w:.1f}" y2="{y:.1f}"/>')
             y += PAD_Y
             for line in part:
-                static = line.startswith('=')
-                text = line[1:].lstrip() if static else line
+                static = line.startswith(('=', '-='))
+                text = shown(line)
                 klass = ' class="static"' if static else ''
                 out.append(f'<text{klass} x="{self.x + PAD_X:.1f}" y="{y + 12:.1f}">'
                            f'{esc(text)}</text>')
@@ -184,7 +192,7 @@ def diagram(boxes, edges=(), title='', caption=''):
     body = [edge_svg(edge, by_name) for edge in edges] + [box.svg() for box in boxes]
     # Never scale a diagram above its natural size: small diagrams would get huge text.
     svg = (f'<svg class="uml" viewBox="{-MARGIN} {-MARGIN} {width:.0f} {height:.0f}" '
-           f'style="max-width: {width:.0f}px" '
+           f'style="max-width: {width:.0f}px; min-width: min(34rem, {width:.0f}px)" '
            f'role="img" aria-label="{esc(title)}" xmlns="http://www.w3.org/2000/svg">'
            f'<title>{esc(title)}</title>\n' + '\n'.join(body) + '\n</svg>')
     cap = f'<figcaption>{caption}</figcaption>' if caption else ''
