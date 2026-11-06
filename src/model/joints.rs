@@ -1,6 +1,9 @@
 use core::fmt;
 
+use mujoco_rs::wrappers::MjJointDataInfo;
+
 use crate::model::ReachyMiniSpec;
+use crate::motion::Interpolate;
 
 pub const COUNT: usize = 9;
 
@@ -15,6 +18,15 @@ impl Antennas {
 
     /// Folded back along the head, as the robot sleeps.
     pub const FOLDED: Antennas = Antennas { right: -3.0, left: 3.0 };
+}
+
+impl Interpolate for Antennas {
+    fn toward(self, target: Antennas, progress: f64) -> Antennas {
+        Antennas {
+            right: self.right.toward(target.right, progress),
+            left: self.left.toward(target.left, progress),
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -36,6 +48,10 @@ impl Head {
     pub const TURN_RIGHT: Head = Head([0.5361, -0.7829, 0.5360, -0.7829, 0.5360, -0.7829]);
     /// Lowered 44 mm and pitched forward 24°: the daemon's sleep pose.
     pub const SLEEP: Head = Head([-0.1706, 0.8365, -0.1234, 0.0876, -0.8122, 0.1785]);
+}
+
+impl Interpolate for Head {
+    fn toward(self, target: Head, progress: f64) -> Self { Head(self.0.toward(target.0, progress)) }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -88,6 +104,15 @@ impl Joints {
     }
 }
 
+impl Interpolate for Joints {
+    fn toward(self, target: Joints, progress: f64) -> Joints {
+        Joints {
+            body_yaw: self.body_yaw.toward(target.body_yaw, progress),
+            head: self.head.toward(target.head, progress),
+            antennas: self.antennas.toward(target.antennas, progress),
+        }
+    }
+}
 impl fmt::Display for Joints {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "body {:+.3} | head", self.body_yaw)?;

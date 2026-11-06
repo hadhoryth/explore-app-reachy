@@ -2,6 +2,7 @@
 // use std::time::Duration;
 
 mod model;
+mod motion;
 
 use clap::{ArgGroup, Parser};
 use std::sync::atomic::{AtomicBool, Ordering};
