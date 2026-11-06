@@ -2,45 +2,50 @@ use crate::model::COUNT;
 use std::f64::consts::TAU;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-struct Limits {
-    min: f64,
-    max: f64,
+pub struct Limits {
+    pub min: f64,
+    pub max: f64,
 }
 
-const fn ticks_to_radians(v: i32) -> f64 { (v as f64 - 2048.) * TAU / 4096.0 }
-
 impl Limits {
-    fn clamp(self, value: f64) -> f64 { value.clamp(self.min, self.max) }
     #[must_use]
-    fn contains(self, value: f64, margin: f64) -> bool {
-        value <= self.max + margin && value >= self.min - margin
+    pub fn clamp(self, value: f64) -> f64 { value.clamp(self.min, self.max) }
+    #[must_use]
+    pub fn contains(self, value: f64, margin: f64) -> bool {
+        (self.min - margin..=self.max + margin).contains(&value)
     }
     const fn symmetric(max: f64) -> Limits { Limits { min: -max, max } }
     const fn from_ticks(min: i32, max: i32) -> Limits {
-        Limits { min: ticks_to_radians(min), max: ticks_to_radians(max) }
+        Limits {
+            min: Limits::ticks_to_radians(min),
+            max: Limits::ticks_to_radians(max),
+        }
     }
+    const fn ticks_to_radians(v: i32) -> f64 { (v as f64 - 2048.) * TAU / 4096.0 }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-struct JointSpec {
+pub struct JointSpec {
     name: &'static str,
-    limits: Limits,
-    motor_id: u8,
-    p_gain: u16,
-    sim_name: &'static str,
-    sim_sign: f64,
+    pub limits: Limits,
+    /// The Dynamixel ID of its motor on the bus.
+    pub motor_id: u8,
+    // The position P gain its motor runs with.
+    pub p_gain: u16,
+    pub sim_name: &'static str,
+    pub sim_sign: f64,
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ReachyMiniSpec {
-    body: JointSpec,
-    head: [JointSpec; 6],
-    right_antenna: JointSpec,
-    left_antenna: JointSpec,
+    pub body: JointSpec,
+    pub head: [JointSpec; 6],
+    pub right_antenna: JointSpec,
+    pub left_antenna: JointSpec,
 }
 
 impl ReachyMiniSpec {
     #[must_use]
-    fn joints(&self) -> [JointSpec; COUNT] {
+    pub fn joints(&self) -> [JointSpec; COUNT] {
         let [s1, s2, s3, s4, s5, s6] = self.head;
         [
             self.body,
