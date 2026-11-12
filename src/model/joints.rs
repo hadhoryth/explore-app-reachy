@@ -1,7 +1,5 @@
 use core::fmt;
 
-use mujoco_rs::wrappers::MjJointDataInfo;
-
 use crate::model::ReachyMiniSpec;
 use crate::motion::Interpolate;
 
@@ -20,17 +18,8 @@ impl Antennas {
     pub const FOLDED: Antennas = Antennas { right: -3.0, left: 3.0 };
 }
 
-impl Interpolate for Antennas {
-    fn toward(self, target: Antennas, progress: f64) -> Antennas {
-        Antennas {
-            right: self.right.toward(target.right, progress),
-            left: self.left.toward(target.left, progress),
-        }
-    }
-}
-
 #[derive(Clone, Copy, Debug, PartialEq)]
-struct Head([f64; 6]);
+pub struct Head([f64; 6]);
 impl Head {
     /// Upright and looking straight ahead.
     pub const NEUTRAL: Head = Head([0.6265, -0.6265, 0.6265, -0.6265, 0.6265, -0.6265]);
@@ -50,12 +39,8 @@ impl Head {
     pub const SLEEP: Head = Head([-0.1706, 0.8365, -0.1234, 0.0876, -0.8122, 0.1785]);
 }
 
-impl Interpolate for Head {
-    fn toward(self, target: Head, progress: f64) -> Self { Head(self.0.toward(target.0, progress)) }
-}
-
 #[derive(Clone, Copy, Debug, PartialEq)]
-struct Joints {
+pub struct Joints {
     pub body_yaw: f64,
     pub head: Head,
     pub antennas: Antennas,
@@ -102,6 +87,19 @@ impl Joints {
             .map(|(a, b)| (a - b).abs())
             .fold(0.0, f64::max)
     }
+}
+
+impl Interpolate for Antennas {
+    fn toward(self, target: Antennas, progress: f64) -> Antennas {
+        Antennas {
+            right: self.right.toward(target.right, progress),
+            left: self.left.toward(target.left, progress),
+        }
+    }
+}
+
+impl Interpolate for Head {
+    fn toward(self, target: Head, progress: f64) -> Self { Head(self.0.toward(target.0, progress)) }
 }
 
 impl Interpolate for Joints {

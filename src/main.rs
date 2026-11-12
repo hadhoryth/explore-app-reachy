@@ -1,8 +1,10 @@
 // use std::thread;
 // use std::time::Duration;
 
+mod backend;
 mod model;
 mod motion;
+mod reachy;
 
 use clap::{ArgGroup, Parser};
 use std::sync::atomic::{AtomicBool, Ordering};

@@ -1,15 +1,16 @@
 use std::error::Error;
 use std::time::Duration;
 
-use crate::motion::Antennas;
+use crate::model::{Joints, ReachyMiniSpec};
 
 pub type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
 pub trait Backend {
+    fn spec(&self) -> &'static ReachyMiniSpec;
     fn is_running(&self) -> bool { true }
 
-    fn read(&mut self) -> Result<Antennas>;
-    fn write(&mut self, target: Antennas) -> Result<()>;
+    fn read(&mut self) -> Result<Joints>;
+    fn write(&mut self, command: Joints) -> Result<()>;
 
     fn advance(&mut self, period: Duration) -> Result<()> { Ok(()) }
 }
@@ -18,13 +19,14 @@ pub trait Backend {
 mod tests {
     use super::*;
 
-    /// The smallest possible backend: only the two required methods.
     struct Still;
 
     impl Backend for Still {
-        fn read(&mut self) -> Result<Antennas> { Ok(Antennas { right: 0.0, left: 0.0 }) }
+        fn spec(&self) -> &'static ReachyMiniSpec { &crate::model::REACHY_MINI_LITE }
 
-        fn write(&mut self, _target: Antennas) -> Result<()> { Ok(()) }
+        fn read(&mut self) -> Result<Joints> { Ok(Joints::AWAKE) }
+
+        fn write(&mut self, _command: Joints) -> Result<()> { Ok(()) }
     }
 
     #[test]
