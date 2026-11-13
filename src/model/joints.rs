@@ -7,8 +7,8 @@ pub const COUNT: usize = 9;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Antennas {
-    right: f64,
-    left: f64,
+    pub right: f64,
+    pub left: f64,
 }
 impl Antennas {
     /// Upright, tilted 10° so gravity takes up the gearbox play.

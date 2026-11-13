@@ -5,14 +5,15 @@ mod backend;
 mod model;
 mod motion;
 mod reachy;
+mod routines;
 
 use clap::{ArgGroup, Parser};
 use std::sync::atomic::{AtomicBool, Ordering};
 
-// use crate::device::Device;
-// use crate::motion::{Antennas, play};
-// use crate::motions::antenna_wiggle;
-// use crate::sim::{SCENE, Sim};
+use crate::backend::{Backend, Sim};
+use crate::model::REACHY_MINI_LITE;
+use crate::reachy::ReachyMini;
+use crate::routines::Routine;
 //
 //
 use std::error::Error;
@@ -40,53 +41,41 @@ struct Cli {
 }
 
 static STOP: AtomicBool = AtomicBool::new(false);
+static ABORT: AtomicBool = AtomicBool::new(false);
 
 fn main() -> Result<()> {
-    let _cli = Cli::parse();
+    let cli = Cli::parse();
     ctrlc::set_handler(|| STOP.store(true, Ordering::Relaxed))?;
+    if cli.sim {
+        run_sim();
+    } else {
+        todo!();
+        // run_device(cli.port.as_deref(), cli.watch)
+    }
     Ok(())
-    // if cli.sim {
-    //     run_sim()
-    // } else {
-    //     run_device(cli.port.as_deref(), cli.watch)
-    // }
 }
 
-// fn run_sim() -> Result<()> {
-//     !todo!("Later")
-//     // let mut backend = Sim::new(&SCENE)?;
-//     // play(&mut backend, &antenna_wiggle(), &STOP)?;
-//     // backend.hold(&STOP)?;
-//     // Ok(())
-// }
-//
-// fn run_device(port: Option<&str>, watch_only: bool) -> Result<()> {
-//     !todo!("Later")
-//     // let mut device = Device::open(port)?;
-//     // if watch_only {
-//     //     return watch(&mut device);
-//     // }
-//     // device.enable()?;
-//     // play(&mut device, &antenna_wiggle(), &STOP)?;
-//     // Ok(())
-// }
-//
-// fn watch(backend: &mut dyn Backend) -> Result<()> {
-//     println!("Torque is off move antennas manually");
-//     let mut angles = Antennas::REST;
-//     while !STOP.load(Ordering::Relaxed) {
-//         let next = backend.read()?;
-//         if next.right != angles.right || next.left != angles.left {
-//             angles = next;
-//             println!(
-//                 "right {:+.3} rad   left {:+.3} rad",
-//                 angles.right, angles.left
-//             );
-//         }
-//         thread::sleep(Duration::from_millis(200));
-//     }
-//     Ok(())
-// }
+fn run_sim() -> Result<()> {
+    let mut reachy = ReachyMini::new(Sim::new(&REACHY_MINI_LITE, None)?)?;
+    perform(&mut reachy, Routine::Wiggle, &STOP, &ABORT)?;
+    reachy.hold(&STOP)?;
+    Ok(())
+}
+
+fn perform<B: Backend>(
+    reachy: &mut ReachyMini<B>,
+    routine: Routine,
+    stop: &AtomicBool,
+    abort: &AtomicBool,
+) -> Result<()> {
+    let performed = reachy.wake_up(stop);
+    if stop.load(Ordering::Relaxed) {
+        println!("Going to sleep. Press Ctrl+C again to cut the torque now.");
+    }
+    // let slept = reachy.sleep(abort);
+    // performed.and(slept)
+    Ok(())
+}
 
 #[cfg(test)]
 mod tests {

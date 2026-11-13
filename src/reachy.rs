@@ -45,6 +45,24 @@ impl<B: Backend> ReachyMini<B> {
         }
         Ok(())
     }
+
+    pub fn hold(&mut self, stop: &AtomicBool) -> Result<()> {
+        let mut ticker = Ticker::new(CONTROL_PERIOD);
+        while !stop.load(Ordering::Relaxed) && self.backend.is_running() {
+            self.backend.write(self.commanded)?;
+            self.backend.advance(CONTROL_PERIOD);
+            ticker.wait();
+        }
+        Ok(())
+    }
+
+    pub fn wake_up(&mut self, stop: &AtomicBool) -> Result<()> {
+        self.goto(Joints::AWAKE.into(), POSTURE_TIME, stop)
+    }
+
+    pub fn sleep(&mut self, abort: &AtomicBool) -> Result<()> {
+        self.goto(Joints::SLEEP.into(), POSTURE_TIME, abort)
+    }
 }
 
 #[derive(Debug)]
