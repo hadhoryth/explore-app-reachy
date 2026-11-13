@@ -1,7 +1,10 @@
+mod sim;
+
 use std::error::Error;
 use std::time::Duration;
 
 use crate::model::{Joints, ReachyMiniSpec};
+pub use sim::Sim;
 
 pub type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
