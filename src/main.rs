@@ -1,6 +1,3 @@
-// use std::thread;
-// use std::time::Duration;
-
 mod backend;
 mod model;
 mod motion;
@@ -14,8 +11,7 @@ use crate::backend::{Backend, Sim};
 use crate::model::REACHY_MINI_LITE;
 use crate::reachy::ReachyMini;
 use crate::routines::Routine;
-//
-//
+
 use std::error::Error;
 use std::result;
 pub type Result<T> = result::Result<T, Box<dyn Error>>;
@@ -72,9 +68,9 @@ fn perform<B: Backend>(
     if stop.load(Ordering::Relaxed) {
         println!("Going to sleep. Press Ctrl+C again to cut the torque now.");
     }
-    // let slept = reachy.sleep(abort);
-    // performed.and(slept)
-    Ok(())
+    reachy.act(&routine.moves(), &stop)?;
+    let slept = reachy.sleep(abort);
+    performed.and(slept)
 }
 
 #[cfg(test)]

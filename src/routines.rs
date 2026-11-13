@@ -10,7 +10,7 @@ pub enum Routine {
 }
 
 impl Routine {
-    fn moves(self) -> Vec<Move> {
+    pub fn moves(self) -> Vec<Move> {
         match self {
             Routine::Wiggle => wiggle(),
             Routine::Nod => nod(),

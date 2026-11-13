@@ -4,7 +4,7 @@ use std::time::{Duration, Instant};
 
 use crate::backend::{Backend, Result};
 use crate::model::Joints;
-use crate::motion::{Interpolate, Target, min_jerk};
+use crate::motion::{Interpolate, Move, Target, min_jerk};
 
 pub const CONTROL_PERIOD: Duration = Duration::from_millis(20);
 pub const MAX_SPEED: f64 = 2.0;
@@ -52,6 +52,13 @@ impl<B: Backend> ReachyMini<B> {
             self.backend.write(self.commanded)?;
             self.backend.advance(CONTROL_PERIOD);
             ticker.wait();
+        }
+        Ok(())
+    }
+
+    pub fn act(&mut self, moves: &[Move], stop: &AtomicBool) -> Result<()> {
+        for next in moves {
+            self.goto(next.target, next.duration, stop);
         }
         Ok(())
     }
