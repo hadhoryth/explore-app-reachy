@@ -43,7 +43,7 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
     ctrlc::set_handler(|| STOP.store(true, Ordering::Relaxed))?;
     if cli.sim {
-        run_sim();
+        run_sim()?;
     } else {
         todo!();
         // run_device(cli.port.as_deref(), cli.watch)
@@ -68,7 +68,7 @@ fn perform<B: Backend>(
     if stop.load(Ordering::Relaxed) {
         println!("Going to sleep. Press Ctrl+C again to cut the torque now.");
     }
-    reachy.act(&routine.moves(), &stop)?;
+    reachy.act(&routine.moves(), stop)?;
     let slept = reachy.sleep(abort);
     performed.and(slept)
 }

@@ -50,7 +50,7 @@ impl<B: Backend> ReachyMini<B> {
         let mut ticker = Ticker::new(CONTROL_PERIOD);
         while !stop.load(Ordering::Relaxed) && self.backend.is_running() {
             self.backend.write(self.commanded)?;
-            self.backend.advance(CONTROL_PERIOD);
+            self.backend.advance(CONTROL_PERIOD)?;
             ticker.wait();
         }
         Ok(())
@@ -58,7 +58,7 @@ impl<B: Backend> ReachyMini<B> {
 
     pub fn act(&mut self, moves: &[Move], stop: &AtomicBool) -> Result<()> {
         for next in moves {
-            self.goto(next.target, next.duration, stop);
+            self.goto(next.target, next.duration, stop)?;
         }
         Ok(())
     }

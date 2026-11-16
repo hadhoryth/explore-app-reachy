@@ -20,7 +20,7 @@ pub struct Sim {
 impl<'model> Sim {
     pub fn new(spec: &'static ReachyMiniSpec, scene: Option<&str>) -> Result<Self> {
         let scene = scene.unwrap_or(SCENE);
-        let model = Box::new(MjModel::from_xml(&scene)?);
+        let model = Box::new(MjModel::from_xml(scene)?);
         let timestep = model.opt().timestep;
         let viewer = MjViewer::builder().build_passive(&model)?;
         let data = MjData::new(model);

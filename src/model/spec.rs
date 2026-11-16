@@ -26,7 +26,7 @@ impl Limits {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct JointSpec {
-    name: &'static str,
+    pub name: &'static str,
     pub limits: Limits,
     /// The Dynamixel ID of its motor on the bus.
     pub motor_id: u8,

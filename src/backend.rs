@@ -1,3 +1,4 @@
+mod device;
 mod sim;
 
 use std::error::Error;
@@ -15,7 +16,7 @@ pub trait Backend {
     fn read(&mut self) -> Result<Joints>;
     fn write(&mut self, command: Joints) -> Result<()>;
 
-    fn advance(&mut self, period: Duration) -> Result<()> { Ok(()) }
+    fn advance(&mut self, _period: Duration) -> Result<()> { Ok(()) }
 }
 
 #[cfg(test)]
